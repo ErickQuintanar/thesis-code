@@ -4,7 +4,7 @@ import pennylane as qml
 from pennylane import numpy as np
 
 num_qubits = 1
-shots = 100
+shots = 1000
 
 # Coherent noise overrotation parameter
 epsilon = ((np.pi * 2) / 360) * 10 # ~10 degrees
@@ -51,9 +51,6 @@ def circuit_ry_iso(x):
 
     return qml.expval(qml.PauliZ(0))
 
-# NOTE: No noise incurred if dev = dev_rz, however noise is incurred with |1> if dev = dev_ry??????'
-# NOTE: StatePrep is not responsible for this behavior, tried to prepare state with X gates and noise was still there
-# NOTE: Maybe X gate is implemented with Y rotation gates under the hood(?), but then why is there no noise with the dev_rz device
 @qml.qnode(dev_rz)
 def circuit_rz(x):
     '''
