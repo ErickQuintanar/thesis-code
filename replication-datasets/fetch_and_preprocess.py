@@ -28,7 +28,7 @@ df.loc[:, "petallength"] = 0
 # Save dataset
 df.to_csv('iris_preprocessed.txt', sep='\t', index=False)
 print("Iris dataset preprocessed and saved.")
-'''
+
 
 # Retrieve Diabetes dataset
 df = fetch_openml(name="diabetes", version=1, as_frame=True).frame
@@ -83,9 +83,13 @@ print(df.shape)
 df["Class"] = df["Class"].map({"benign" : 0 , "malignant" : 1}).astype("int32")
 
 # TODO: change int64 to float dtypes
-# Rescale features between [0,1]
+# Standard normalized and rescale between [0;1]
 features = ('Clump_Thickness', 'Cell_Size_Uniformity', 'Cell_Shape_Uniformity', 'Marginal_Adhesion', 'Single_Epi_Cell_Size', 'Bare_Nuclei',
        'Bland_Chromatin', 'Normal_Nucleoli', 'Mitoses')
+
+sc = StandardScaler(copy=False)
+df.loc[:,features] = sc.fit_transform(df.loc[:,features])
+
 rescaler = MinMaxScaler(copy=False)
 df.loc[:,features] = rescaler.fit_transform(df.loc[:,features])
 
@@ -96,7 +100,7 @@ df = df.loc[(df!=0).any(axis=1)]
 df.to_csv('breast_cancer_preprocessed.txt', sep='\t', index=False)
 print("Breast Cancer dataset preprocessed and saved.")
 
-
+'''
 # Retrieve MNIST dataset
 df = fetch_openml(name="mnist_784", version=1, as_frame=True).frame
 
