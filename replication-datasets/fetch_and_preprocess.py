@@ -1,12 +1,16 @@
 from sklearn.datasets import fetch_openml
 from skimage.transform import resize
 from sklearn.preprocessing import normalize, StandardScaler, MinMaxScaler
+
 import numpy as np
 import pandas as pd
 
+import os
+from PIL import Image
+
 # Fix random generator
 np.random.seed(0)
-'''
+
 # Retrieve Iris data set
 df = fetch_openml(name="iris", version=1, as_frame=True).frame
 
@@ -66,7 +70,7 @@ df_subset.loc[:,features] = rescaler.fit_transform(df_subset.loc[:,features])
 df_subset.to_csv('diabetes_preprocessed.txt', sep='\t', index=False)
 print("Diabetes dataset preprocessed and saved.")
 
-'''
+
 # Retrieve Breast Cancer dataset
 df = fetch_openml(name="breast-w", version=1, as_frame=True).frame
 print(df.shape)
@@ -100,7 +104,7 @@ df = df.loc[(df!=0).any(axis=1)]
 df.to_csv('breast_cancer_preprocessed.txt', sep='\t', index=False)
 print("Breast Cancer dataset preprocessed and saved.")
 
-'''
+
 # Retrieve MNIST dataset
 df = fetch_openml(name="mnist_784", version=1, as_frame=True).frame
 
@@ -113,6 +117,7 @@ X_reshaped = X.reshape(-1, 28, 28)
 X_resized = np.array([resize(image, (16, 16), preserve_range=True) for image in X_reshaped])
 X_resized_flat = X_resized.reshape(-1, 16*16)
 
+# TODO: Standard normalize
 # Rescale features between [0,1]
 rescaler = MinMaxScaler(copy=False)
 X_resized_flat_rescaled = rescaler.fit_transform(X_resized_flat)
@@ -145,4 +150,34 @@ df_db["target"] = df_db["target"].map({1 : 0 , 9 : 1}).astype("int32")
 
 # Save dataset
 df_db.to_csv('mnist2_preprocessed.txt', sep='\t', index=False)
-print("MNIST2 dataset preprocessed and saved.")'''
+print("MNIST2 dataset preprocessed and saved.")
+
+# Extract Plus-Minus dataset
+rows = []
+for root, _, files in os.walk("pm_data"):
+	for file in files:
+		if file.lower().endswith('.png'):
+			image_path = os.path.join(root, file)
+
+			# Retrieve flattened image information
+			with Image.open(image_path) as img:
+				pixel_data = list(img.getdata())
+				label = image_path.split("/")[2][-1:]
+				rows.append(pixel_data + [int(label)])
+
+
+# Create a DataFrame from the rows
+features = [f'pixel_{i}' for i in range(len(rows[0]) - 1)]
+columns = features + ['class']
+df = pd.DataFrame(rows, columns=columns)
+
+# Standard normalized and rescale between [0;1]
+sc = StandardScaler(copy=False)
+df.loc[:,features] = sc.fit_transform(df.loc[:,features])
+
+rescaler = MinMaxScaler(copy=False)
+df.loc[:,features] = rescaler.fit_transform(df.loc[:,features])
+
+# Save dataset
+df.to_csv("plus-minus_preprocessed.txt", sep='\t', index=False)
+print("Plus-Minus dataset preprocessed and saved.")
