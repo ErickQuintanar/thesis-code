@@ -12,11 +12,11 @@ from alive_progress import alive_bar
 
 np.random.seed(0)
 
-num_qubits = 3
-num_layers = 40
-learning_rate = 0.005 # TODO: Check if this lr=0.0005 was also a mistake
-batch_size = 30 # 16
-epochs = 10
+num_qubits = 2
+num_layers = 2
+learning_rate = 0.05
+batch_size = 30
+epochs = 100
 test_size = 0.4
 
 dev = qml.device("default.qubit", wires=num_qubits)
@@ -55,8 +55,8 @@ def accuracy(predictions, labels):
     acc = acc / len(labels)
     return acc
 
-# Retrieve dataset and split the dataset into training and testing sets (70/30 split)
-df = pd.read_csv('../replication-datasets/diabetes_preprocessed.txt', sep='\t')
+# Retrieve dataset and split the dataset into training and testing sets (60/40 split)
+df = pd.read_csv('../replication-datasets/iris_preprocessed.txt', sep='\t')
 X = torch.tensor(df.iloc[:, 0:(df.shape[1]-1)].values, requires_grad=False)
 Y = torch.tensor(df.iloc[:, -1].values, requires_grad=False)
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=test_size, random_state=0)
@@ -111,7 +111,7 @@ print("Accuracy on unseen data:", acc_test)
 print(f"L.R.: {learning_rate:f} | Epochs: {epochs:4d} | Layers: {num_layers:4d} | Batch Size: {batch_size:4d} | Accuracy: {acc_test:0.7f}")
 
 # Store experiment results
-filename = "reports/diabetes_results_probs.csv"
+filename = "reports/iris_results.csv"
 if os.path.exists(filename):
     # Append result
     with open(filename,'a') as file:

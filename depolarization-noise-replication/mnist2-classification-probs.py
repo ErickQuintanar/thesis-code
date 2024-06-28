@@ -17,7 +17,7 @@ batch_size = 512
 epochs = 30
 test_size = 0.02
 validation_size = 0.18
-mem_size = 4000
+mem_size = 500
 
 dev = qml.device("default.qubit", wires=num_qubits)
 
@@ -33,7 +33,7 @@ def variational_classifier(parameters, x):
     
     qml.StronglyEntanglingLayers(weights=parameters, wires=range(num_qubits))
 
-    return qml.probs(wires=[0,1])
+    return qml.probs(wires=[0])
 
 shape = qml.StronglyEntanglingLayers.shape(n_layers=num_layers, n_wires=num_qubits)
 parameters = np.random.random(size=shape)
@@ -56,7 +56,7 @@ def accuracy(predictions, labels):
     return acc
 
 # Retrieve dataset and split the dataset into training, validation and testing sets (80/18/2 split)
-df = pd.read_csv('../replication-datasets/mnist4_preprocessed.txt', sep='\t')
+df = pd.read_csv('../replication-datasets/mnist2_preprocessed.txt', sep='\t')
 X = df.iloc[:, 0:(df.shape[1]-1)].values
 Y = df.iloc[:, -1].values
 train, validation, test = np.split(df.sample(frac=1, random_state=0), [int((1-(validation_size+test_size))*len(df)), int((1-test_size)*len(df))])
@@ -135,7 +135,7 @@ print("Accuracy on unseen data:", acc_test)
 print(f"L.R.: {learning_rate:f} | Epochs: {epochs:4d} | Layers: {num_layers:4d} | Batch Size: {batch_size:4d} | Accuracy: {acc_test:0.7f}")
 
 # Store experiment results
-filename = "reports/mnist4_results.csv"
+filename = "reports/mnist2_results.csv"
 if os.path.exists(filename):
     # Append result
     with open(filename,'a') as file:
