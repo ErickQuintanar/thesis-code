@@ -3,3 +3,4 @@ lr	epochs	layers	batch_size	accuracy	validation_set_size	test_set_size
 0.005	30	40	512	1.0	18.0	2.0
 0.005	30	40	512	1.0	18.0	2.0
 0.005	30	40	512	tensor(1.)	18.0	2.0
+0.005	30	40	512	tensor(1. complete batch)	18.0	2.0

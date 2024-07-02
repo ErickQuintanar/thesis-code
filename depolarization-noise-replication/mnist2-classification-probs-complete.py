@@ -9,6 +9,7 @@ import pandas as pd
 from alive_progress import alive_bar
 
 np.random.seed(0)
+torch.manual_seed(0)
 
 num_qubits = 8
 num_layers = 40
@@ -33,7 +34,7 @@ def variational_classifier(parameters, x):
     
     qml.StronglyEntanglingLayers(weights=parameters, wires=range(num_qubits))
 
-    return qml.probs(wires=[0,1])
+    return qml.probs(wires=[0])
 
 # Use Binary Cross Entropy Loss
 def cost(weights, X, Y):
@@ -53,7 +54,7 @@ def accuracy(predictions, labels):
     return acc
 
 # Retrieve dataset and split the dataset into training, validation and testing sets (80/18/2 split)
-df = pd.read_csv('../replication-datasets/mnist4_preprocessed.txt', sep='\t')
+df = pd.read_csv('../replication-datasets/mnist2_preprocessed.txt', sep='\t')
 X = df.iloc[:, 0:(df.shape[1]-1)].values
 Y = df.iloc[:, -1].values
 train, validation, test = np.split(df.sample(frac=1, random_state=0), [int((1-(validation_size+test_size))*len(df)), int((1-test_size)*len(df))])
@@ -79,11 +80,12 @@ def closure():
 with alive_bar(epochs) as bar:
     for epoch in range(epochs):
         # Update the weights by one optimizer step, using only a limited batch of data
-        batch_index = torch.tensor(np.random.randint(0, len(X_train), (batch_size,)))
-        X_batch = X_train[batch_index]
-        Y_batch = torch.index_select(Y_train, 0, batch_index)
-        opt.step(closure)
-
+        permutation = torch.randperm(X_train.size()[0])
+        for i in range(0,X_train.size()[0], batch_size):
+            indices = permutation[i:i+batch_size]
+            X_batch, Y_batch = X_train[indices], Y_train[indices]
+            opt.step(closure)
+            
         # Compute predictions on train and validation set
         predictions_train = torch.empty(0)
         predictions_val = torch.empty(0)
@@ -132,7 +134,7 @@ print("Accuracy on unseen data:", acc_test)
 print(f"L.R.: {learning_rate:f} | Epochs: {epochs:4d} | Layers: {num_layers:4d} | Batch Size: {batch_size:4d} | Accuracy: {acc_test:0.7f}")
 
 # Store experiment results
-filename = "reports/mnist4_results.csv"
+filename = "reports/mnist2_results.csv"
 if os.path.exists(filename):
     # Append result
     with open(filename,'a') as file:

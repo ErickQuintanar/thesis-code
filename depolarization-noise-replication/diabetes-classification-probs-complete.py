@@ -1,4 +1,5 @@
 import os.path
+import torch
 
 import pennylane as qml
 from pennylane import numpy as np
@@ -10,6 +11,7 @@ from sklearn.model_selection import train_test_split
 from alive_progress import alive_bar
 
 np.random.seed(0)
+torch.manual_seed(0)
 
 num_qubits = 3
 num_layers = 40
@@ -18,12 +20,11 @@ batch_size = 30 # 16
 epochs = 10
 test_size = 0.4
 
-print()
-
 dev = qml.device("default.qubit", wires=num_qubits)
 
-@qml.qnode(dev)
-def circuit(parameters, x):
+# Strongly entangled binary classificator for diabetes dataset
+@qml.qnode(dev, interface="torch")
+def variational_classifier(parameters, x):
     '''
         parameters: (layers, qubits, 3)
         x: datapoint
@@ -33,22 +34,18 @@ def circuit(parameters, x):
     
     qml.StronglyEntanglingLayers(weights=parameters, wires=range(num_qubits))
 
-    return qml.expval(qml.PauliZ(0))
-
-# Strongly entangled binary classificator for diabetes dataset
-def variational_classifier(weights, bias, X):
-    preds = circuit(weights, X) + bias
-    # Rescale value between 0 and 1
-    return (preds + 1) * 0.5
+    return qml.probs(wires=[0])
 
 # Use Binary Cross Entropy Loss
-def cost(weights, bias, X, Y):
-    predictions = variational_classifier(weights, bias, X)
-    loss = -(Y * np.log(predictions) + (1 - Y) * np.log(1 - predictions)).mean()
-    return loss
+def cost(weights, X, Y):
+    predictions = variational_classifier(weights, X)
+    loss = torch.nn.CrossEntropyLoss(reduction="mean")
+    return loss(target=Y, input=predictions)
 
+# Choose more likely prediction from probability distribution
 def threshold(prediction):
-    return np.where(prediction > 0.5, 1, 0)
+    _, indices = torch.max(prediction, dim=1)
+    return indices
 
 # Determine accuracy of predictions
 def accuracy(predictions, labels):
@@ -58,36 +55,46 @@ def accuracy(predictions, labels):
 
 # Retrieve dataset and split the dataset into training and testing sets (70/30 split)
 df = pd.read_csv('../replication-datasets/diabetes_preprocessed.txt', sep='\t')
-X = df.iloc[:, 0:(df.shape[1]-1)].values
-Y = df.iloc[:, -1].values
+X = torch.tensor(df.iloc[:, 0:(df.shape[1]-1)].values, requires_grad=False)
+Y = torch.tensor(df.iloc[:, -1].values, requires_grad=False)
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=test_size, random_state=0)
 
-weights = np.random.randn(num_layers, num_qubits, 3, requires_grad=True)
-bias = np.array(0.0, requires_grad=True)
+weights = torch.tensor(np.random.randn(num_layers, num_qubits, 3), requires_grad=True)
 
 # Initialize optimizer
-opt = qml.AdamOptimizer(stepsize=learning_rate)
+opt = torch.optim.Adam([weights], lr=learning_rate)
+
+def closure():
+    opt.zero_grad()
+    loss = cost(weights, X_batch, Y_batch)
+    loss.backward()
+    return loss
 
 # Train variational classifier
 with alive_bar(epochs) as bar:
     for epoch in range(epochs):
 
         # Update the weights by one optimizer step, using only a limited batch of data
-        batch_index = np.random.randint(0, len(X_train), (batch_size,))
-        X_batch = X_train[batch_index]
-        Y_batch = Y_train[batch_index]
-        weights, bias, _, _ = opt.step(cost, weights, bias, X_batch, Y_batch)
+        '''permutation = torch.randperm(X_train.size()[0])
+        for i in range(0,X_train.size()[0], batch_size):
+            indices = permutation[i:i+batch_size]
+            X_batch, Y_batch = X_train[indices], Y_train[indices]
+            opt.step(closure)'''
+        
+        X_batch = X_train
+        Y_batch = Y_train
+        opt.step(closure)
 
         # Compute predictions on training set
         print("Computing predictions on training set...")
-        predictions = threshold(variational_classifier(weights, bias, X_train))
+        predictions = threshold(variational_classifier(weights, X_train))
 
         # Compute accuracy on training set
         print("Computing accuracy...")
         acc = accuracy(predictions, Y_train)
 
         print("Computing current cost...")
-        current_cost = cost(weights, bias, X, Y)
+        current_cost = cost(weights, X, Y)
 
         print(f"Epoch: {epoch+1:4d} | Cost: {current_cost:0.7f} | Accuracy: {acc:0.7f}")
         bar()
@@ -100,14 +107,14 @@ with alive_bar(epochs) as bar:
             break
 
 # Test variational classifier
-predictions_test = threshold(variational_classifier(weights, bias, X_test))
+predictions_test = threshold(variational_classifier(weights, X_test))
 acc_test = accuracy(predictions_test, Y_test)
 
 print("Accuracy on unseen data:", acc_test)
 print(f"L.R.: {learning_rate:f} | Epochs: {epochs:4d} | Layers: {num_layers:4d} | Batch Size: {batch_size:4d} | Accuracy: {acc_test:0.7f}")
 
 # Store experiment results
-filename = "reports/diabetes_results.csv"
+filename = "reports/diabetes_results_probs.csv"
 if os.path.exists(filename):
     # Append result
     with open(filename,'a') as file:

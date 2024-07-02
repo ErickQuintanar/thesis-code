@@ -9,6 +9,7 @@ import pandas as pd
 from alive_progress import alive_bar
 
 np.random.seed(0)
+#torch.manual_seed(0)
 
 num_qubits = 8
 num_layers = 40
@@ -79,11 +80,11 @@ def closure():
 with alive_bar(epochs) as bar:
     for epoch in range(epochs):
         # Update the weights by one optimizer step, using only a limited batch of data
-        batch_index = torch.tensor(np.random.randint(0, len(X_train), (batch_size,)))
-        X_batch = X_train[batch_index]
-        Y_batch = torch.index_select(Y_train, 0, batch_index)
-        opt.step(closure)
-
+        permutation = torch.randperm(X_train.size()[0])
+        for i in range(0,X_train.size()[0], batch_size):
+            indices = permutation[i:i+batch_size]
+            X_batch, Y_batch = X_train[indices], Y_train[indices]
+            opt.step(closure)
         # Compute predictions on train and validation set
         predictions_train = torch.empty(0)
         predictions_val = torch.empty(0)

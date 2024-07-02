@@ -17,7 +17,7 @@ batch_size = 512
 epochs = 30
 test_size = 0.02
 validation_size = 0.18
-mem_size = 500
+mem_size = 4000
 
 dev = qml.device("default.qubit", wires=num_qubits)
 
@@ -34,9 +34,6 @@ def variational_classifier(parameters, x):
     qml.StronglyEntanglingLayers(weights=parameters, wires=range(num_qubits))
 
     return qml.probs(wires=[0])
-
-shape = qml.StronglyEntanglingLayers.shape(n_layers=num_layers, n_wires=num_qubits)
-parameters = np.random.random(size=shape)
 
 # Use Binary Cross Entropy Loss
 def cost(weights, X, Y):

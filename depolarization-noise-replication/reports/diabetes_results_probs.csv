@@ -8,3 +8,12 @@ lr	epochs	layers	batch_size	accuracy	test_set_size
 0.005	10	40	30	tensor(0.6837)	40.0
 0.005	10	40	30	tensor(0.6837)	40.0
 0.005	10	40	30	tensor(0.6837)	40.0
+0.005	10	40	30	tensor(0.6326 complete batched)	40.0
+0.005	10	40	30	tensor(0.6326 complete batched)	40.0
+0.005	10	40	30	tensor(0.7256 complete set)	40.0
+0.005	10	40	30	tensor(0.7256 complete set)	40.0
+0.005	7	40	30	tensor(0.6698 complete batch)	40.0
+0.005	30	40	30	tensor(0.6977 complete set)	40.0
+0.005	15	40	30	tensor(0.6419 complete set)	40.0
+0.005	16	40	30	tensor(0.6372 complete set)	40.0
+0.005	10	40	30	tensor(0.7256 complete set)	40.0

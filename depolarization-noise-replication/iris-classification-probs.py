@@ -35,9 +35,6 @@ def variational_classifier(parameters, x):
 
     return qml.probs(wires=[0])
 
-shape = qml.StronglyEntanglingLayers.shape(n_layers=num_layers, n_wires=num_qubits)
-parameters = np.random.random(size=shape)
-
 # Use Binary Cross Entropy Loss
 def cost(weights, X, Y):
     predictions = variational_classifier(weights, X)

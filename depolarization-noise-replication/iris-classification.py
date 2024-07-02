@@ -1,4 +1,5 @@
 import os.path
+import torch
 
 import pennylane as qml
 from pennylane import numpy as np
@@ -32,9 +33,6 @@ def circuit(parameters, x):
     qml.StronglyEntanglingLayers(weights=parameters, wires=range(num_qubits))
 
     return qml.expval(qml.PauliZ(0))
-
-shape = qml.StronglyEntanglingLayers.shape(n_layers=num_layers, n_wires=num_qubits)
-parameters = np.random.random(size=shape)
 
 # Strongly entangled binary classificator for iris dataset
 def variational_classifier(weights, bias, X):
@@ -74,10 +72,15 @@ with alive_bar(epochs) as bar:
     for epoch in range(epochs):
 
         # Update the weights by one optimizer step, using only a limited batch of data
-        batch_index = np.random.randint(0, len(X_train), (batch_size,))
-        X_batch = X_train[batch_index]
-        Y_batch = Y_train[batch_index]
-        weights, bias, _, _ = opt.step(cost, weights, bias, X_batch, Y_batch)
+        permutation = torch.randperm(X_train.size()[0])
+        for i in range(0,X_train.size()[0], batch_size):
+            indices = permutation[i:i+batch_size]
+            X_batch, Y_batch = X_train[indices], Y_train[indices]
+            opt.step(closure)
+        
+        '''X_batch = X_train
+        Y_batch = Y_train
+        opt.step(closure)'''
 
         # Compute predictions on training set
         print("Computing predictions on training set...")

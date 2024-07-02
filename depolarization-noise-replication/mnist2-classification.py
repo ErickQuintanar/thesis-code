@@ -32,9 +32,6 @@ def circuit(parameters, x):
 
     return qml.expval(qml.PauliZ(0))
 
-shape = qml.StronglyEntanglingLayers.shape(n_layers=num_layers, n_wires=num_qubits)
-parameters = np.random.random(size=shape)
-
 # Strongly entangled binary classificator for MNIST2 dataset
 def variational_classifier(weights, bias, X):
     preds = circuit(weights, X) + bias
