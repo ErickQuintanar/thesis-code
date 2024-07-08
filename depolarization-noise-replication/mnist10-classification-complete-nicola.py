@@ -1,10 +1,14 @@
 import os.path
 import torch
+import torchvision
+import cv2
 
 import pennylane as qml
 from pennylane import numpy as np
 
 import pandas as pd
+
+from sklearn.model_selection import train_test_split
 
 from alive_progress import alive_bar
 
@@ -14,11 +18,61 @@ torch.manual_seed(0)
 num_qubits = 8
 num_layers = 40
 learning_rate = 0.005
-batch_size = 128
+batch_size = 512
 epochs = 30
 test_size = 0.02
 validation_size = 0.18
 mem_size = 4000
+
+def data_preprocessing_mnist(class_labels, im_size=16):
+    nr_classes = len(class_labels)
+    if not os.path.exists(f'./data/mnist{nr_classes}'):
+        os.makedirs(f'./data/mnist{nr_classes}')
+
+    if os.path.exists(f'./data/mnist{nr_classes}/mnist_data.npz'):
+        data = np.load(f'./data/mnist{nr_classes}/mnist_data.npz')
+        # convert to torch tensors
+        X_train = torch.tensor(data['x_train'], requires_grad=False).float()
+        Y_train = torch.tensor(data['y_train'], requires_grad=False).float()
+        X_test = torch.tensor(data['x_test'], requires_grad=False).float()
+        Y_test = torch.tensor(data['y_test'], requires_grad=False).float()
+        X_vali = torch.tensor(data['x_vali'], requires_grad=False).float()
+        Y_vali = torch.tensor(data['y_vali'], requires_grad=False).float()
+        X = torch.cat((X_train, X_test, X_vali))
+        Y = torch.cat((Y_train, Y_test, Y_vali))
+    else:
+        data_set = torchvision.datasets.MNIST("./data/mnist/", train=True, download=True)
+        X = []
+        Y = []
+        for i in range(len(data_set)):
+            if data_set[i][1] in class_labels:
+                x_rescaled = cv2.resize(np.asarray(data_set[i][0]), (int(im_size), int(im_size)))
+                X.append(x_rescaled)
+                Y.append(class_labels.index(data_set[i][1]))
+
+        nr_classes = len(class_labels)
+        X = np.asarray(X)
+        Y = np.asarray(Y)
+        X = np.reshape(X, (X.shape[0], int(im_size) ** 2))
+        Y = np.eye(nr_classes)[Y]
+
+        X = X / 255.0
+
+        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+        X_vali, X_test, Y_vali, Y_test = train_test_split(X_test, Y_test, test_size=0.1, random_state=42)
+
+        np.savez(f'./data/mnist{nr_classes}/mnist_data.npz', x_train=X_train, y_train=Y_train, x_test=X_test,
+                 y_test=Y_test,
+                 x_vali=X_vali, y_vali=Y_vali)
+        # convert to torch tensors
+        X_train = torch.tensor(X_train, requires_grad=False).float()
+        Y_train = torch.tensor(Y_train, requires_grad=False).float()
+        X_test = torch.tensor(X_test, requires_grad=False).float()
+        Y_test = torch.tensor(Y_test, requires_grad=False).float()
+        X_vali = torch.tensor(X_vali, requires_grad=False).float()
+        Y_vali = torch.tensor(Y_vali, requires_grad=False).float()
+
+    return X, Y, X_train, Y_train, X_vali, Y_vali, X_test, Y_test
 
 dev = qml.device("default.qubit", wires=num_qubits)
 
@@ -54,18 +108,18 @@ def accuracy(predictions, labels):
     return acc
 
 # Retrieve dataset and split the dataset into training, validation and testing sets (80/18/2 split)
-df = pd.read_csv('../replication-datasets/mnist10_preprocessed.txt', sep='\t')
-X = df.iloc[:, 0:(df.shape[1]-1)].values
-Y = df.iloc[:, -1].values
-train, validation, test = np.split(df.sample(frac=1, random_state=0), [int((1-(validation_size+test_size))*len(df)), int((1-test_size)*len(df))])
-Y_train = torch.tensor(train['target'].values, requires_grad=False)
-X_train = torch.tensor(train.drop(columns=['target']).values, requires_grad=False)
-Y_validation = torch.tensor(validation['target'].values, requires_grad=False)
-X_validation = torch.tensor(validation.drop(columns=['target']).values, requires_grad=False)
-Y_test = torch.tensor(test['target'].values, requires_grad=False)
-X_test = torch.tensor(test.drop(columns=['target']).values, requires_grad=False)
+X, Y, X_train, Y_train, X_validation, Y_validation, X_test, Y_test = data_preprocessing_mnist(class_labels=[0,1,2,3,4,5,6,7,8,9])
+Y_train = threshold(Y_train)
+Y_validation = threshold(Y_validation)
+Y_test = threshold(Y_test)
+Y = threshold(Y)
 
-weights = torch.tensor(np.random.randn(num_layers, num_qubits, 3), requires_grad=True)
+#weights = torch.tensor(np.random.randn(num_layers, num_qubits, 3), requires_grad=True)
+shape_strong = qml.StronglyEntanglingLayers.shape(n_layers=num_layers, n_wires=num_qubits)
+weights = torch.tensor((2 * torch.pi * torch.rand(size=shape_strong, requires_grad=False)), requires_grad=True)
+
+specs = qml.specs(variational_classifier, expansion_strategy="device")(weights, X_train[0])
+print(specs)
 
 # Initialize optimizer
 opt = torch.optim.Adam([weights], lr=learning_rate)
@@ -117,7 +171,7 @@ with alive_bar(epochs) as bar:
         bar()
 
         #TODO: Improve early stopping mechanism
-        #TODO: Save weights and bias
+        #TODO: Save weights
         # Early stopping
         if (1 - acc) < 1e-5:
             print("Early stopping...")

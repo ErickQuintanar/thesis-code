@@ -1,0 +1,2 @@
+lr	epochs	layers	batch_size	accuracy	test_set_size
+0.05	100	2	30	tensor(1.)	40.0

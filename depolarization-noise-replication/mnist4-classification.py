@@ -21,7 +21,7 @@ mem_size = 4000
 
 dev = qml.device("default.qubit", wires=num_qubits)
 
-# Strongly entangled binary classificator for diabetes dataset
+# Strongly entangled classificator for diabetes dataset
 @qml.qnode(dev, interface="torch")
 def variational_classifier(parameters, x):
     '''

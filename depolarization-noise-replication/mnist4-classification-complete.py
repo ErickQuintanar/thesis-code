@@ -9,7 +9,7 @@ import pandas as pd
 from alive_progress import alive_bar
 
 np.random.seed(0)
-#torch.manual_seed(0)
+torch.manual_seed(0)
 
 num_qubits = 8
 num_layers = 40
@@ -22,7 +22,7 @@ mem_size = 4000
 
 dev = qml.device("default.qubit", wires=num_qubits)
 
-# Strongly entangled binary classificator for diabetes dataset
+# Strongly entangled classificator for diabetes dataset
 @qml.qnode(dev, interface="torch")
 def variational_classifier(parameters, x):
     '''

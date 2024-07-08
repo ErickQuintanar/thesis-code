@@ -1,0 +1,10 @@
+{
+    "dataset" : "iris",
+    "num_qubits" : 2,
+    "num_layers" : 2,
+    "learning_rate" : 0.05,
+    "batch_size" : 30,
+    "epochs" : 100,
+    "qml_model" : "pqc", 
+    "noise_model" : "None"
+}
