@@ -14,7 +14,7 @@ torch.manual_seed(0)
 num_qubits = 8
 num_layers = 40
 learning_rate = 0.005
-batch_size = 128
+batch_size = 512
 epochs = 30
 test_size = 0.02
 validation_size = 0.18
