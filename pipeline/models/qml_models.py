@@ -58,7 +58,7 @@ def pqc(dev, config):
     return pqc_circuit
 
 def pqc_incoherent_noise(dev, config):
-    p = config["epsilon"]
+    p = config["probability"]
 
     # Adjust noise injection for differents types of incoherent noise
     if config["noise_model"] == "depolarizing":

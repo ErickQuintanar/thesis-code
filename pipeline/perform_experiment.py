@@ -15,6 +15,8 @@ def perform_experiment(config, results_path="/mnt/c/Users/erick/Dropbox/5.Semest
         # Open and load the JSON file
         with open(directory + filename, 'r') as file:
             # Compare data with config
+            if filename == ".gitkeep":
+                continue
             data = json.load(file)
             differences = diff(config, data)
             if len(differences.keys()) < 2:

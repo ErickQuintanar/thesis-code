@@ -43,8 +43,12 @@ def train_script(config):
     # Once model's training is finished, save weights and config to done experiments
     trained_weights = model.weights.detach().numpy()
     unique_id = str(uuid.uuid4())
-    weights_path = "../results/weights/"+config["dataset"]+"/"+config["dataset"]+"-"+config["qml_model"]+"-"+config["noise_model"]+"-"+unique_id+".npy"
-    config_path = "../results/configs/"+config["dataset"]+"/"+config["dataset"]+"-"+config["qml_model"]+"-"+config["noise_model"]+"-"+unique_id+".json"
+    if config["noise_model"] == "none":
+        weights_path = "../results/weights/"+config["dataset"]+"/"+config["dataset"]+"-"+config["qml_model"]+"-"+config["noise_model"]+"-"+unique_id+".npy"
+        config_path = "../results/configs/"+config["dataset"]+"/"+config["dataset"]+"-"+config["qml_model"]+"-"+config["noise_model"]+"-"+unique_id+".json"
+    else:
+        weights_path = "../results/weights/"+config["dataset"]+"/"+config["dataset"]+"-"+config["qml_model"]+"-"+config["noise_model"]+"-"+str(int(config["probability"]*100))+"-"+unique_id+".npy"
+        config_path = "../results/configs/"+config["dataset"]+"/"+config["dataset"]+"-"+config["qml_model"]+"-"+config["noise_model"]+"-"+str(int(config["probability"]*100))+"-"+unique_id+".json"
     config["id"] = unique_id
 
     np.save(weights_path, trained_weights)
