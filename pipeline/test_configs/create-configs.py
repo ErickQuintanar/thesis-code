@@ -9,6 +9,8 @@ noise_models = ['amplitude-damping', 'bit-flip', 'depolarizing', 'phase-damping'
 
 probabilities = [0.02, 0.04, 0.06, 0.08, 0.1]
 
+miscalibrations = [2, 4, 6, 8, 10]
+
 def save_config(path, config):
     with open(path, mode="w", encoding="utf-8") as file:
         json.dump(config, file, indent = 6)
@@ -36,7 +38,7 @@ breast_cancer_base = {
     "num_classes" : 2,
     "learning_rate" : 0.0005,
     "batch_size" : 16,
-    "epochs" : 100
+    "epochs" : 10
 }
 
 diabetes_base = {
@@ -87,6 +89,18 @@ mnist10_base = {
     "epochs" : 30
 }
 
+plus_minus_base = {
+    "dataset" : "plus-minus",
+    "qml_model" : "pqc",
+    "noise_model" : "none",
+    "num_qubits" : 8,
+    "num_layers" : 32,
+    "num_classes" : 4,
+    "learning_rate" : 0.001,
+    "batch_size" : 50,
+    "epochs" : 10
+}
+
 if dataset == "iris":
     config = iris_base
 elif dataset == "breast-cancer":
@@ -99,6 +113,8 @@ elif dataset == "mnist4":
     config = mnist4_base
 elif dataset == "mnist10":
     config = mnist10_base
+elif dataset == "plus-minus":
+    config = plus_minus_base
 else:
     print("Dataset is currently not supported.")
     sys.exit(1)
@@ -113,7 +129,17 @@ for qml_model in qml_models:
     config["qml_model"] = qml_model
     for noise_model in noise_models:
         config["noise_model"] = noise_model
-        for probability in probabilities:
-            config["probability"] = probability
-            config_path = config["dataset"]+"/"+config["dataset"]+"-"+config["qml_model"]+"-"+config["noise_model"]+"-"+str(int(config["probability"]*100))+".json"
-            save_config(config_path, config)
+        if noise_model == "coherent":
+            if "probability" in config:
+                config.pop("probability")
+            for miscalibration in miscalibrations:
+                config["miscalibration"] = miscalibration
+                config_path = config["dataset"]+"/"+config["dataset"]+"-"+config["qml_model"]+"-"+config["noise_model"]+"-"+str(int(config["miscalibration"]))+".json"
+                save_config(config_path, config)
+        else:
+            if "miscalibration" in config:
+                config.pop("miscalibration")
+            for probability in probabilities:
+                config["probability"] = probability
+                config_path = config["dataset"]+"/"+config["dataset"]+"-"+config["qml_model"]+"-"+config["noise_model"]+"-"+str(int(config["probability"]*100))+".json"
+                save_config(config_path, config)

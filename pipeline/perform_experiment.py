@@ -19,7 +19,7 @@ def perform_experiment(config, results_path="/mnt/c/Users/erick/Dropbox/5.Semest
                 continue
             data = json.load(file)
             differences = diff(config, data)
-            if len(differences.keys()) < 2:
+            if len(differences.keys()) < 3:
                 print("Experiment has already been performed with id = "+str(differences["id"]))
                 print("Config is at: "+directory+filename)
                 print("Weights are at: "+results_path+"/weights/"+config["dataset"]+"/"+filename[:-4]+"npy")

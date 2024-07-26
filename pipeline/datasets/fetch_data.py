@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 
 import torch
+from torchvision import transforms
 
 import os
 from PIL import Image
@@ -17,9 +18,9 @@ from PIL import Image
 # Fix random generator
 np.random.seed(0)
 
-def exisiting(name):
+def exisiting(name, path="datasets"):
 	# Check if dataset already is downloaded
-	files = [f for f in os.listdir('datasets') if os.path.isfile(os.path.join("datasets", f))]
+	files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
 	for f in files:
 		if (name+".txt") == f:
 			return True
@@ -29,7 +30,7 @@ def prepare_for_training(df):
 	# Separate dataset in training and test datasets
 	X = torch.tensor(df.iloc[:, 0:(df.shape[1]-1)].values, requires_grad=False)
 	Y = torch.tensor(df.iloc[:, -1].values, requires_grad=False)
-	return train_test_split(X, Y, test_size=0.4, random_state=0, stratify=Y)
+	return train_test_split(X, Y, test_size=0.3, random_state=0, stratify=Y)
 
 def fetch_iris():
 	# Retrieve Iris data set
@@ -200,7 +201,9 @@ def fetch_plus_minus():
 
 				# Retrieve flattened image information
 				with Image.open(image_path) as img:
-					pixel_data = list(img.getdata())
+					crop = transforms.CenterCrop(size=16)
+					resized_img = crop(img)
+					pixel_data = list(resized_img.getdata())
 					label = image_path.split("/")[3][-1:]
 					rows.append(pixel_data + [int(label)])
 
@@ -221,11 +224,11 @@ def fetch_plus_minus():
 	print("Plus-Minus dataset preprocessed and saved.")
 	return df
 
-def fetch_dataset(name):
-	if exisiting(name):
+def fetch_dataset(name, path="datasets"):
+	if exisiting(name, path):
 		# Retrieve dataset and separate in train and test parts
 		print("Dataset already exists")
-		df = pd.read_csv('datasets/'+name+'.txt', sep='\t')
+		df = pd.read_csv(path+'/'+name+'.txt', sep='\t')
 		return prepare_for_training(df)
 	if name == "iris":
 		print("Iris dataset is being fetched.")

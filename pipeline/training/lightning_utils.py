@@ -49,9 +49,9 @@ class TrainingModule(pl.LightningModule):
         X, Y = batch
         predictions = self.model(X)
         loss = self.loss_function(predictions, Y)
-        acc = accuracy(threshold(predictions), Y)
-        self.log("val_loss", loss, prog_bar=True, on_epoch=True)
-        self.log("val_acc", acc, prog_bar=True, on_epoch=True)
+        self.acc = accuracy(threshold(predictions), Y).item()
+        self.log("test_loss", loss, prog_bar=True, on_epoch=True)
+        self.log("test_acc", self.acc, prog_bar=True, on_epoch=True)
         return loss
     
     # TODO: Factorize code in steps to reduce footprint

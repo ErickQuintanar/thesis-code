@@ -18,8 +18,9 @@ def define_model(config):
         elif config["noise_model"] == "coherent":
             # TODO: Figure out how to inject artificial coherent noise
             print("Coherent PQC model incoming")
+            return pqc_coherent_noise(dev, config), loss
         else:
-            print("Incoherent noise PQC model incoming")
+            print("Setting up noise PQC model.")
             return pqc_incoherent_noise(dev, config), loss
     elif config["qml_model"] == "kernel":
         print("Model type implementation coming soon!")
@@ -63,17 +64,38 @@ def pqc_incoherent_noise(dev, config):
     # Adjust noise injection for differents types of incoherent noise
     if config["noise_model"] == "depolarizing":
         operation = qml.DepolarizingChannel
-        print("Depolarizing PQC model incoming")
+        print("Setting up depolarizing PQC model.")
     elif config["noise_model"] == "bit-flip":
         operation = qml.BitFlip
-        print("Bit-flip PQC model incoming")
+        print("Setting up bit-flip PQC model.")
     elif config["noise_model"] == "phase-flip":
         operation = qml.PhaseFlip
-        print("Phase-flip PQC model incoming")
+        print("Setting up phase-flip PQC model.")
     elif config["noise_model"] == "phase-damping":
         operation = qml.PhaseDamping
-        print("Phase-damping PQC model incoming")
+        print("Setting up phase-damping PQC model.")
     elif config["noise_model"] == "amplitude-damping":
         operation = qml.AmplitudeDamping
-        print("Amplitude-damping PQC model incoming")
+        print("Setting up amplitude-damping PQC model.")
     return qml.transforms.insert(pqc(dev, config), op=operation, op_args=p, position="all")
+
+def pqc_coherent_noise(dev, config):
+    # Build coherent noise model
+    theta = config["miscalibration"]
+
+    c_ry = qml.noise.op_eq(qml.RY)
+    c_rz = qml.noise.op_eq(qml.RZ)
+    c_cnot = qml.noise.op_eq(qml.CNOT)
+
+    def n_ry(op, **metadata):
+        qml.RY(((np.pi * 2) / 360) * metadata["theta"], op.wires)
+
+    def n_rz(op, **metadata):
+        qml.RZ(((np.pi * 2) / 360) * metadata["theta"], op.wires)
+    
+    def n_cnot(op, **metadata):
+        qml.CRX(((np.pi * 2) / 360) * metadata["theta"], op.wires)
+
+    noise_model = qml.NoiseModel({c_ry: n_ry, c_rz: n_rz, c_cnot: n_cnot}, theta=theta)
+
+    return qml.transforms.add_noise(pqc(dev, config), noise_model=noise_model)

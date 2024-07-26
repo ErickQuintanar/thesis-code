@@ -6,6 +6,7 @@ import torch
 import pennylane as qml
 from pennylane import numpy as np
 import pytorch_lightning as pl
+from sklearn.model_selection import train_test_split
 
 import uuid
 import json
@@ -30,15 +31,26 @@ def train_script(config):
     training_model = TrainingModule(model, loss, lambda params: torch.optim.Adam(params, lr=config["learning_rate"]))
 
     train_set = Dataset(X_train, Y_train)
-    test_set = Dataset(X_test, Y_test)
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=config["batch_size"], shuffle=True, num_workers=os.cpu_count())
-    test_loader = torch.utils.data.DataLoader(test_set, batch_size=config["batch_size"], shuffle=False, num_workers=os.cpu_count())
-
-    # TODO: Adjust datasets and training if dataset has validation dataset
-
     trainer = pl.Trainer(max_epochs=config["epochs"], accelerator="cpu")
-    trainer.fit(training_model, train_dataloaders=train_loader)
-    #trainer.fit(training_model, train_dataloaders=train_loader, val_dataloaders=test_loader)
+
+    # Adjust datasets and training if dataset has validation dataset
+    if config["dataset"] == "mnist2" or config["dataset"] == "mnist4" or config["dataset"] == "mnist10":
+        X_val, X_test, Y_val, Y_test = train_test_split(X_test, Y_test, test_size=0.5, random_state=0, stratify=Y_test)
+        val_set = Dataset(X_val, Y_val)
+        test_set = Dataset(X_test, Y_test)
+        val_loader = torch.utils.data.DataLoader(val_set, batch_size=config["batch_size"], shuffle=False, num_workers=os.cpu_count())
+        test_loader = torch.utils.data.DataLoader(test_set, batch_size=config["batch_size"], shuffle=False, num_workers=os.cpu_count())
+        trainer.fit(training_model, train_dataloaders=train_loader, val_dataloaders=val_loader)
+    else:
+        test_set = Dataset(X_test, Y_test)
+        test_loader = torch.utils.data.DataLoader(test_set, batch_size=config["batch_size"], shuffle=False, num_workers=os.cpu_count())
+        trainer.fit(training_model, train_dataloaders=train_loader)
+
+    # Test model on unseen data
+    trainer.test(training_model, dataloaders=[test_loader])
+    print("Accuracy on test: "+str(training_model.acc))
+    config["accuracy"] = training_model.acc
 
     # Once model's training is finished, save weights and config to done experiments
     trained_weights = model.weights.detach().numpy()
@@ -46,6 +58,9 @@ def train_script(config):
     if config["noise_model"] == "none":
         weights_path = "../results/weights/"+config["dataset"]+"/"+config["dataset"]+"-"+config["qml_model"]+"-"+config["noise_model"]+"-"+unique_id+".npy"
         config_path = "../results/configs/"+config["dataset"]+"/"+config["dataset"]+"-"+config["qml_model"]+"-"+config["noise_model"]+"-"+unique_id+".json"
+    elif config["noise_model"] == "coherent":
+        weights_path = "../results/weights/"+config["dataset"]+"/"+config["dataset"]+"-"+config["qml_model"]+"-"+config["noise_model"]+"-"+str(int(config["miscalibration"]))+"-"+unique_id+".npy"
+        config_path = "../results/configs/"+config["dataset"]+"/"+config["dataset"]+"-"+config["qml_model"]+"-"+config["noise_model"]+"-"+str(int(config["miscalibration"]))+"-"+unique_id+".json"
     else:
         weights_path = "../results/weights/"+config["dataset"]+"/"+config["dataset"]+"-"+config["qml_model"]+"-"+config["noise_model"]+"-"+str(int(config["probability"]*100))+"-"+unique_id+".npy"
         config_path = "../results/configs/"+config["dataset"]+"/"+config["dataset"]+"-"+config["qml_model"]+"-"+config["noise_model"]+"-"+str(int(config["probability"]*100))+"-"+unique_id+".json"
@@ -57,5 +72,3 @@ def train_script(config):
         json.dump(config, file, indent = 6)
 
     print("Weights saved in "+weights_path)
-
-    trainer.test(training_model, dataloaders=[test_loader])

@@ -1,0 +1,19 @@
+Create configuration files:
+    1. cd test_configs
+    2. python create-configs.py [dataset]
+
+Train all models from created configurations per dataset:
+    1. sh run_tests.sh [dataset]
+
+Get adversarial samples once models have been trained:
+    1. cd aml
+    2. python attacks.py [dataset] [qml_model]
+
+Perform accuracy analysis once adversarial samples have been created:
+    1. cd aml
+    2. python analysis.py [dataset] [qml_model]
+
+###################################################################
+
+Train single configuration model:
+    1. python perform_experiment.py --config 
