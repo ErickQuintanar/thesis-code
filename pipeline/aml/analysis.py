@@ -89,6 +89,17 @@ def adversarial_analysis(noise_model, probability):
             acc = model_accuracy(model, adversarial_test_set)
             results.append([qml_model, noise_model, probability, aml_attack, epsilon, acc])
 
+def prepare_figure():
+    font2 = {'weight':'bold', 'size':12}
+    plt.xlabel('Attack Strength Epsilon', fontdict=font2)
+    plt.ylabel('Accuracy', fontdict=font2)
+    plt.xlim(left=epsilons[0])
+    plt.ylim(bottom=0)
+    plt.xticks(epsilons)
+    plt.yticks(range(0, 101, 10))
+    plt.legend(loc='best')
+    plt.tight_layout()
+
 def create_figures(df):
     # Graph Möttönen method bounds and observed data
     font = {'weight':'bold', 'size':15}
@@ -98,7 +109,7 @@ def create_figures(df):
     incoherent_noise = ['amplitude-damping', 'bit-flip', 'depolarizing', 'phase-damping', 'phase-flip']
     colors = ['red', 'blue', 'green', 'orange', 'purple']
     # cols = ["qml_model", "noise_model", "probability|miscalibration", "aml_attack", "epsilon", "accuracy"]
-    # TODO: Extract qml_model and dataset for title
+    # TODO: Extract qml_model and dataset for title and fix wrapping issues
 
     for noise, color in zip(incoherent_noise, colors):
         data = df.loc[(df['noise_model'] == noise) & (df['aml_attack'] == 'none')]
@@ -113,7 +124,7 @@ def create_figures(df):
     plt.xticks(probabilities)
     plt.yticks(range(0, 101, 10))
     plt.tight_layout()
-    plt.savefig("analysis_results/"+dataset+"/"+qml_model+"/figures/figure_1.png")
+    plt.savefig("analysis_results/"+dataset+"/"+qml_model+"/figures/accuracy-incoherent.png")
 
     plt.clf()
 
@@ -128,11 +139,41 @@ def create_figures(df):
     plt.xticks(miscalibrations)
     plt.yticks(range(0, 101, 10))
     plt.tight_layout()
-    plt.savefig("analysis_results/"+dataset+"/"+qml_model+"/figures/figure_2.png")
-
+    plt.savefig("analysis_results/"+dataset+"/"+qml_model+"/figures/accuracy-coherent.png")
     plt.clf()
 
     # TODO: loop over noise_model in noise_models
+    for noise_model in noise_models:
+        for aml_attack in aml_attacks:
+            if noise_model == "none":
+                data = df.loc[(df['noise_model'] == noise_model) & (df['aml_attack'] == aml_attack)]
+                plt.plot(data['epsilon'], data['accuracy'], color='blue')
+                # TODO: determine appropiate title
+                plt.title('asdfasdfel', fontdict=font)
+                prepare_figure()
+                # TODO: Fix figure naming
+                plt.savefig("analysis_results/"+dataset+"/"+qml_model+"/figures/"+noise_model+"-"+aml_attack+".png")
+                plt.clf()
+            elif noise_model == "coherent":
+                for miscalibration, color in zip(miscalibrations, colors):
+                    data = df.loc[(df['noise_model'] == noise_model) & (df['aml_attack'] == aml_attack) & (df['probability|miscalibration'] == miscalibration)]
+                    plt.plot(data['epsilon'], data['accuracy'], color=color, label=miscalibration)
+                    # TODO: determine appropiate title
+                plt.title('asdfasdfel', fontdict=font)
+                prepare_figure()
+                # TODO: Fix figure naming
+                plt.savefig("analysis_results/"+dataset+"/"+qml_model+"/figures/"+noise_model+"-"+aml_attack+".png")
+                plt.clf()
+            else:
+                for probability, color in zip(probabilities, colors):
+                    data = df.loc[(df['noise_model'] == noise_model) & (df['aml_attack'] == aml_attack) & (df['probability|miscalibration'] == probability)]
+                    plt.plot(data['epsilon'], data['accuracy'], color=color, label=probability)
+                    # TODO: determine appropiate title
+                plt.title('asdfasdfel', fontdict=font)
+                prepare_figure()
+                # TODO: Fix figure naming
+                plt.savefig("analysis_results/"+dataset+"/"+qml_model+"/figures/"+noise_model+"-"+aml_attack+".png")
+                plt.clf()
     # TODO: loop over aml_attack in aml_attacks
     # TODO: Check special cases for coherent and noiseless models for the labels and no loops respectively
 
@@ -147,7 +188,7 @@ if os.path.isdir(results_path):
         os.makedirs(results_path+"/figures", exist_ok=True)
         if os.path.isdir(results_path+"/figures"):
             items = os.listdir(results_path+"/figures")
-            if len(items) == 20: # TODO: Are they really 20 figures??? 16 is probably right
+            if len(items) == 16:
                 print("Figures have already been created.")
                 exit()
             else:
