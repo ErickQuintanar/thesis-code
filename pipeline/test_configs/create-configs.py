@@ -3,7 +3,8 @@ import json
 
 dataset = sys.argv[1]
 
-qml_models = ['pqc', 'kernel']
+qml_models = ['pqc']
+#qml_models = ['pqc', 'kernel']
 
 noise_models = ['amplitude-damping', 'bit-flip', 'depolarizing', 'phase-damping', 'phase-flip', 'coherent']
 
