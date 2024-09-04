@@ -1,6 +1,7 @@
 # Create config files
 echo "Creating required configuration files"
 cd pipeline/test_configs
+python create-configs.py iris
 python create-configs.py plus-minus
 python create-configs.py mnist10
 python create-configs.py mnist4

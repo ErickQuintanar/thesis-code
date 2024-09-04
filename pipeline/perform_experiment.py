@@ -9,7 +9,7 @@ from training.train_model import train_script
 # TODO: Include results path in argument(?)
 
 #def perform_experiment(config, results_path="/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/Code/results"):
-def perform_experiment(config, results_path="/Code/results"):
+def perform_experiment(config, results_path="/thesis-code/results"):
     # Check if experiment has already been performed
     directory = results_path+"/configs/"+config["dataset"]+"/"
     for filename in os.listdir(directory):            
