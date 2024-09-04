@@ -1,0 +1,17 @@
+depolarization-noise-replication/data
+pipeline/datasets/*.txt
+pipeline/datasets/pm_data/
+pipeline/lightning_logs
+quantum_kernel/
+replication-datasets/data/
+replication-datasets/pm_data/
+replication-datasets/*.txt
+replication-datasets/datasets.py
+variational_classifier/
+*test.py
+.gitignore
+__pycache__
+*.json
+*.npy
+*.csv
+pennylane/
