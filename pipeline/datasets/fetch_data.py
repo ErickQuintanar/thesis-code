@@ -46,7 +46,7 @@ def fetch_iris():
 	df["class"] = df["class"].map({"Iris-setosa" : 0 , "Iris-virginica" : 1}).astype("int32")
 
 	# Set "petal_width" feature to 0
-	df.loc[:, "petallength"] = 0
+	df.loc[:, "petalwidth"] = 0
 
 	# Normalize features with L2-norm per data point (maybe eliminate rn)
 	#df.loc[:,("sepallength","sepalwidth","petallength","petalwidth")] = normalize(df[["sepallength","sepalwidth","petallength","petalwidth"]], norm="l2")

@@ -16,8 +16,6 @@ def save_config(path, config):
     with open(path, mode="w", encoding="utf-8") as file:
         json.dump(config, file, indent = 6)
 
-# TODO: Save base configs for plus-minus model
-
 iris_base = {
     "dataset" : "iris",
     "qml_model" : "pqc",

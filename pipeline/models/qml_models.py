@@ -8,8 +8,8 @@ import torch
 
 def define_model(config):
     # Check which QML model to use
-    #dev = qml.device("default.mixed", wires=config["num_qubits"])
-    dev = qml.device("lightning.gpu", wires=config["num_qubits"])
+    dev = qml.device("default.mixed", wires=config["num_qubits"])
+    #dev = qml.device("lightning.gpu", wires=config["num_qubits"])
     loss = torch.nn.CrossEntropyLoss(reduction="mean")
     if config["qml_model"] == "pqc":
         # Check noise model to determine which device and model to use
