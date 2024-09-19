@@ -36,7 +36,7 @@ def train_script(config):
 
     # Adjust datasets and training if dataset has validation dataset
     if config["dataset"] == "mnist2" or config["dataset"] == "mnist4" or config["dataset"] == "mnist10":
-        trainer = pl.Trainer(max_epochs=config["epochs"], accelerator="cpu", limit_train_batches=0.2)
+        trainer = pl.Trainer(max_epochs=config["epochs"], accelerator="cpu", limit_train_batches=0.2,  num_sanity_val_steps=0)
         X_val, X_test, Y_val, Y_test = train_test_split(X_test, Y_test, test_size=0.5, random_state=0, stratify=Y_test)
         val_set = Dataset(X_val, Y_val)
         test_set = Dataset(X_test, Y_test)
@@ -44,7 +44,7 @@ def train_script(config):
         test_loader = torch.utils.data.DataLoader(test_set, batch_size=config["batch_size"], shuffle=False, num_workers=os.cpu_count())
         trainer.fit(training_model, train_dataloaders=train_loader, val_dataloaders=val_loader)
     elif config["dataset"] == "plus-minus":
-        trainer = pl.Trainer(max_epochs=config["epochs"], accelerator="cpu", limit_train_batches=0.2)
+        trainer = pl.Trainer(max_epochs=config["epochs"], accelerator="cpu", limit_train_batches=0.2, num_sanity_val_steps=0)
         test_set = Dataset(X_test, Y_test)
         test_loader = torch.utils.data.DataLoader(test_set, batch_size=config["batch_size"], shuffle=False, num_workers=os.cpu_count())
         trainer.fit(training_model, train_dataloaders=train_loader)
