@@ -12,6 +12,7 @@ import pandas as pd
 import torch
 import json
 import matplotlib.pyplot as plt
+from textwrap import wrap
 
 dataset = sys.argv[1]
 qml_model = sys.argv[2]
@@ -24,7 +25,7 @@ probabilities = [0.02, 0.04, 0.06, 0.08, 0.1]
 
 miscalibrations = [2, 4, 6, 8, 10]
 
-epsilons = [0.06, 0.12, 0.18, 0.24, 0.3]
+epsilons = [0.1, 0.3, 0.5, 0.7, 0.9]
 
 results = []
 
@@ -57,12 +58,23 @@ def model_accuracy(model, test_set):
         y_pred = threshold(model(x))
         if y_pred == y:
             correct += 1
-    acc = correct /  test_set.size()[0] * 100.0
+    acc = correct /  test_set.__len__() * 100.0
+    return acc
+
+def adversarial_model_accuracy(labels, adversarial_predictions):
+    correct = 0
+    for y, y_pred in zip(labels, adversarial_predictions):
+        if y_pred == y:
+            correct += 1
+    acc = correct /  labels.shape[0] * 100.0
     return acc
                 
 def adversarial_analysis(noise_model, probability):
     # Retrieve weights and model
     weights, config = retrieve_weights(noise_model, probability)
+
+    # Modify config file such that the evaluating model doesn't have any noise
+    config["noise_model"] = "none"
     qnode, _ = define_model(config)
     model = QMLModel(qnode, weights, config)
 
@@ -83,44 +95,47 @@ def adversarial_analysis(noise_model, probability):
                     df = pd.read_csv(samples_path+'/'+attack, sep='\t')
                     break
             # Calculate adversarial accuracy from model on modified test set
-            X = torch.tensor(df.iloc[:, 0:(df.shape[1]-1)].values, requires_grad=False)
             Y = torch.tensor(df.iloc[:, -1].values, requires_grad=False)
-            adversarial_test_set = Dataset(X, Y)
-            acc = model_accuracy(model, adversarial_test_set)
+            acc = adversarial_model_accuracy(Y_test, Y)
             results.append([qml_model, noise_model, probability, aml_attack, epsilon, acc])
 
-def prepare_figure():
+def prepare_figure(legend):
     font2 = {'weight':'bold', 'size':12}
     plt.xlabel('Attack Strength Epsilon', fontdict=font2)
     plt.ylabel('Accuracy', fontdict=font2)
-    plt.xlim(left=epsilons[0])
-    plt.ylim(bottom=0)
+    plt.xlim(left=0)
+    plt.ylim(bottom=0, top=102)
     plt.xticks(epsilons)
     plt.yticks(range(0, 101, 10))
-    plt.legend(loc='best')
+    if legend:
+        plt.legend(loc='best')
     plt.tight_layout()
 
 def create_figures(df):
-    # Graph Möttönen method bounds and observed data
     font = {'weight':'bold', 'size':15}
     font2 = {'weight':'bold', 'size':12}
     plt.figure(figsize=(5,5))
 
     incoherent_noise = ['amplitude-damping', 'bit-flip', 'depolarizing', 'phase-damping', 'phase-flip']
     colors = ['red', 'blue', 'green', 'orange', 'purple']
-    # cols = ["qml_model", "noise_model", "probability|miscalibration", "aml_attack", "epsilon", "accuracy"]
-    # TODO: Extract qml_model and dataset for title and fix wrapping issues
 
+    # Retrieve baseline performance of the QML model
+    baseline = df.loc[(df['noise_model'] == "none") & (df['aml_attack'] == 'none')]
     for noise, color in zip(incoherent_noise, colors):
         data = df.loc[(df['noise_model'] == noise) & (df['aml_attack'] == 'none')]
-        plt.plot(data['probability|miscalibration'], data['accuracy'], color=color, label=noise)
+        # Add baseline noiseless probability
+        data = pd.concat([baseline, data])
+        data.sort_values("epsilon", inplace=True)
+        print(data)
+        plt.plot(data['probability|miscalibration'], data['accuracy'], color=color, label=noise, alpha=0.7)
     
     plt.xlabel('Probabilities', fontdict=font2)
     plt.ylabel('Accuracy', fontdict=font2)
-    plt.title('Accuracy with Different Probabilites for Incoherent Noise Models', fontdict=font)
+    title = 'Accuracy with different probabilites for incoherent noise models'
+    plt.title('\n'.join(wrap(title, 38)), fontdict=font)
     plt.legend(loc='best')
-    plt.xlim(left=probabilities[0])
-    plt.ylim(bottom=0)
+    plt.xlim(left=0)
+    plt.ylim(bottom=0, top=102)
     plt.xticks(probabilities)
     plt.yticks(range(0, 101, 10))
     plt.tight_layout()
@@ -129,53 +144,89 @@ def create_figures(df):
     plt.clf()
 
     data = df.loc[(df['noise_model'] == 'coherent') & (df['aml_attack'] == 'none')]
-    plt.plot(data['probability|miscalibration'], data['accuracy'], color='blue', label='coherent')
+    # Add baseline noiseless probability
+    data = pd.concat([baseline, data])
+    data.sort_values("epsilon", inplace=True)
+    print(data)
+    plt.plot(data['probability|miscalibration'], data['accuracy'], color='blue', label='coherent', alpha=0.7)
     plt.xlabel('Miscalibrations', fontdict=font2)
     plt.ylabel('Accuracy', fontdict=font2)
-    plt.title('Accuracy with Different Miscalibrations for Coherent Noise Model', fontdict=font)
+    title = 'Accuracy with different miscalibrations for coherent noise model'
+    plt.title('\n'.join(wrap(title, 38)), fontdict=font)
     plt.legend(loc='best')
-    plt.xlim(left=miscalibrations[0])
-    plt.ylim(bottom=0)
+    plt.xlim(left=0)
+    plt.ylim(bottom=0, top=102)
     plt.xticks(miscalibrations)
     plt.yticks(range(0, 101, 10))
     plt.tight_layout()
     plt.savefig("analysis_results/"+dataset+"/"+qml_model+"/figures/accuracy-coherent.png")
     plt.clf()
 
-    # TODO: loop over noise_model in noise_models
+    # Loop over all noise models
     for noise_model in noise_models:
         for aml_attack in aml_attacks:
             if noise_model == "none":
+                baseline = df.loc[(df['noise_model'] == noise_model) & (df['aml_attack'] == 'none')]
                 data = df.loc[(df['noise_model'] == noise_model) & (df['aml_attack'] == aml_attack)]
-                plt.plot(data['epsilon'], data['accuracy'], color='blue')
-                # TODO: determine appropiate title
-                plt.title('asdfasdfel', fontdict=font)
-                prepare_figure()
-                # TODO: Fix figure naming
+                # Add baseline noiseless probability
+                data = pd.concat([baseline, data])
+                data.sort_values("epsilon", inplace=True)
+                print(data)
+                plt.plot(data['epsilon'], data['accuracy'], color='blue', alpha=0.7)
+                title = "Adversarial accuracy with "+(aml_attack.upper())
+                plt.title('\n'.join(wrap(title, 37)), fontdict=font)
+                prepare_figure(False)
                 plt.savefig("analysis_results/"+dataset+"/"+qml_model+"/figures/"+noise_model+"-"+aml_attack+".png")
                 plt.clf()
             elif noise_model == "coherent":
                 for miscalibration, color in zip(miscalibrations, colors):
+                    baseline = df.loc[(df['noise_model'] == noise_model) & (df['aml_attack'] == 'none') & (df['probability|miscalibration'] == miscalibration)]
                     data = df.loc[(df['noise_model'] == noise_model) & (df['aml_attack'] == aml_attack) & (df['probability|miscalibration'] == miscalibration)]
-                    plt.plot(data['epsilon'], data['accuracy'], color=color, label=miscalibration)
-                    # TODO: determine appropiate title
-                plt.title('asdfasdfel', fontdict=font)
-                prepare_figure()
-                # TODO: Fix figure naming
+                    # Add baseline noiseless probability
+                    data = pd.concat([baseline, data])
+                    data.sort_values("epsilon", inplace=True)
+                    print(data)
+                    
+                    plt.plot(data['epsilon'], data['accuracy'], color=color, label=miscalibration, alpha=0.7)
+                
+                # TODO: Add noise_model, miscalibration and aml_attack==none data as well to the dataframe to be plotted
+                baseline = df.loc[(df['noise_model'] == 'none') & (df['aml_attack'] == 'none')]
+                data = df.loc[(df['noise_model'] == 'none') & (df['aml_attack'] == aml_attack)]    
+                data = pd.concat([baseline, data])
+                data.sort_values("epsilon", inplace=True)
+                print(data)
+                plt.plot(data['epsilon'], data['accuracy'], color='grey', label=0, alpha=0.7)
+
+                title = "Adversarial accuracy for "+noise_model+" noise with "+(aml_attack.upper())
+                plt.title('\n'.join(wrap(title, 37)), fontdict=font)
+                prepare_figure(True)
                 plt.savefig("analysis_results/"+dataset+"/"+qml_model+"/figures/"+noise_model+"-"+aml_attack+".png")
                 plt.clf()
             else:
                 for probability, color in zip(probabilities, colors):
+                    baseline = df.loc[(df['noise_model'] == noise_model) & (df['aml_attack'] == 'none') & (df['probability|miscalibration'] == probability)]
                     data = df.loc[(df['noise_model'] == noise_model) & (df['aml_attack'] == aml_attack) & (df['probability|miscalibration'] == probability)]
-                    plt.plot(data['epsilon'], data['accuracy'], color=color, label=probability)
-                    # TODO: determine appropiate title
-                plt.title('asdfasdfel', fontdict=font)
-                prepare_figure()
-                # TODO: Fix figure naming
+                    # Add baseline noiseless probability
+                    data = pd.concat([baseline, data])
+                    data.sort_values("epsilon", inplace=True)
+                    print(data)
+                    
+                    plt.plot(data['epsilon'], data['accuracy'], color=color, label=probability, alpha=0.7)
+
+                # Add noise_model, probability and aml_attack==none data as well to the dataframe to be plotted
+                baseline = df.loc[(df['noise_model'] == 'none') & (df['aml_attack'] == 'none')]
+                data = df.loc[(df['noise_model'] == 'none') & (df['aml_attack'] == aml_attack)]
+                data = pd.concat([baseline, data])
+                data.sort_values("epsilon", inplace=True)
+                print(data)
+                plt.plot(data['epsilon'], data['accuracy'], color='grey', label=0, alpha=0.7)
+
+                title = "Adversarial accuracy for "+noise_model+" noise with "+(aml_attack.upper())
+                plt.title('\n'.join(wrap(title, 37)), fontdict=font)
+                prepare_figure(True)
                 plt.savefig("analysis_results/"+dataset+"/"+qml_model+"/figures/"+noise_model+"-"+aml_attack+".png")
                 plt.clf()
-    # TODO: loop over aml_attack in aml_attacks
-    # TODO: Check special cases for coherent and noiseless models for the labels and no loops respectively
+    print("Figures have beeen created.")
 
 # Check if adversarial analysis is already done
 results_path = "analysis_results/"+dataset+"/"+qml_model
@@ -205,10 +256,6 @@ if os.path.isdir(samples_path):
     if not (len(items) == 10):
         print("AML attacks haven't been performed.")
         exit()
-
-'''# Retrieve preprocessed test dataset according to the arguments
-_, X_test, _, Y_test = fetch_dataset(dataset, path="../datasets")
-test_set = Dataset(X_test, Y_test)'''
 
 # For all noise models, load pre-trained weights and measure accuracy for PGD and FGSM attacks for all epsilons
 for noise_model in noise_models:
