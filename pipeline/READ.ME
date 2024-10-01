@@ -17,3 +17,120 @@ Perform accuracy analysis once adversarial samples have been created:
 
 Train single configuration model:
     1. python perform_experiment.py --config 
+
+iris aml data:
+Dataset already exists
+Setting up noiseless PQC model.
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:76: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_pgd = pd.concat([pd.DataFrame([data], columns=cols), df_pgd], ignore_index=True)
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:80: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_fgsm = pd.concat([pd.DataFrame([data], columns=cols), df_fgsm], ignore_index=True)
+test acc on clean examples (%): 100.000
+test acc on FGSM adversarial examples (%): 100.000 (93)
+test acc on PGD adversarial examples (%): 100.000  (93)
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:76: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_pgd = pd.concat([pd.DataFrame([data], columns=cols), df_pgd], ignore_index=True)
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:80: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_fgsm = pd.concat([pd.DataFrame([data], columns=cols), df_fgsm], ignore_index=True)
+test acc on clean examples (%): 100.000
+test acc on FGSM adversarial examples (%): 86.667
+test acc on PGD adversarial examples (%): 90.000
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:76: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_pgd = pd.concat([pd.DataFrame([data], columns=cols), df_pgd], ignore_index=True)
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:80: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_fgsm = pd.concat([pd.DataFrame([data], columns=cols), df_fgsm], ignore_index=True)
+test acc on clean examples (%): 100.000
+test acc on FGSM adversarial examples (%): 53.333
+test acc on PGD adversarial examples (%): 70.000
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:76: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_pgd = pd.concat([pd.DataFrame([data], columns=cols), df_pgd], ignore_index=True)
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:80: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_fgsm = pd.concat([pd.DataFrame([data], columns=cols), df_fgsm], ignore_index=True)
+test acc on clean examples (%): 100.000
+test acc on FGSM adversarial examples (%): 50.000
+test acc on PGD adversarial examples (%): 73.333
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:76: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_pgd = pd.concat([pd.DataFrame([data], columns=cols), df_pgd], ignore_index=True)
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:80: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_fgsm = pd.concat([pd.DataFrame([data], columns=cols), df_fgsm], ignore_index=True)
+test acc on clean examples (%): 100.000
+test acc on FGSM adversarial examples (%): 50.000
+test acc on PGD adversarial examples (%): 66.667
+
+diabetes aml data:
+Dataset already exists
+Setting up noiseless PQC model.
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:76: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_pgd = pd.concat([pd.DataFrame([data], columns=cols), df_pgd], ignore_index=True)
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:80: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_fgsm = pd.concat([pd.DataFrame([data], columns=cols), df_fgsm], ignore_index=True)
+test acc on clean examples (%): 67.702
+test acc on FGSM adversarial examples (%): 45.963 (47.20)
+test acc on PGD adversarial examples (%): 45.963 (48.44)
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:76: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_pgd = pd.concat([pd.DataFrame([data], columns=cols), df_pgd], ignore_index=True)
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:80: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_fgsm = pd.concat([pd.DataFrame([data], columns=cols), df_fgsm], ignore_index=True)
+test acc on clean examples (%): 67.702
+test acc on FGSM adversarial examples (%): 32.919 (50.31)
+test acc on PGD adversarial examples (%): 32.298 (49.68)
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:76: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_pgd = pd.concat([pd.DataFrame([data], columns=cols), df_pgd], ignore_index=True)
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:80: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_fgsm = pd.concat([pd.DataFrame([data], columns=cols), df_fgsm], ignore_index=True)
+test acc on clean examples (%): 67.702
+test acc on FGSM adversarial examples (%): 32.298 (49.68)
+test acc on PGD adversarial examples (%): 32.298 (49.68)
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:76: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_pgd = pd.concat([pd.DataFrame([data], columns=cols), df_pgd], ignore_index=True)
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:80: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_fgsm = pd.concat([pd.DataFrame([data], columns=cols), df_fgsm], ignore_index=True)
+test acc on clean examples (%): 67.702
+test acc on FGSM adversarial examples (%): 32.298 (49.68)
+test acc on PGD adversarial examples (%): 34.161 (50.31)
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:76: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_pgd = pd.concat([pd.DataFrame([data], columns=cols), df_pgd], ignore_index=True)
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:80: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_fgsm = pd.concat([pd.DataFrame([data], columns=cols), df_fgsm], ignore_index=True)
+test acc on clean examples (%): 67.702
+test acc on FGSM adversarial examples (%): 32.919 (49.06)
+test acc on PGD adversarial examples (%): 33.540 (50.93)
+
+breast-cancer aml data:
+Dataset already exists
+Setting up noiseless PQC model.
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:76: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_pgd = pd.concat([pd.DataFrame([data], columns=cols), df_pgd], ignore_index=True)
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:80: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_fgsm = pd.concat([pd.DataFrame([data], columns=cols), df_fgsm], ignore_index=True)
+test acc on clean examples (%): 84.444
+test acc on FGSM adversarial examples (%): 59.259 (51.85)
+test acc on PGD adversarial examples (%): 58.519 (51.11)
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:76: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_pgd = pd.concat([pd.DataFrame([data], columns=cols), df_pgd], ignore_index=True)
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:80: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_fgsm = pd.concat([pd.DataFrame([data], columns=cols), df_fgsm], ignore_index=True)
+test acc on clean examples (%): 84.444
+test acc on FGSM adversarial examples (%): 42.963 (50.37)
+test acc on PGD adversarial examples (%): 40.741 (49.62)
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:76: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_pgd = pd.concat([pd.DataFrame([data], columns=cols), df_pgd], ignore_index=True)
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:80: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_fgsm = pd.concat([pd.DataFrame([data], columns=cols), df_fgsm], ignore_index=True)
+test acc on clean examples (%): 84.444
+test acc on FGSM adversarial examples (%): 28.148 (48.88)
+test acc on PGD adversarial examples (%): 35.556 (51.85)
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:76: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_pgd = pd.concat([pd.DataFrame([data], columns=cols), df_pgd], ignore_index=True)
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:80: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_fgsm = pd.concat([pd.DataFrame([data], columns=cols), df_fgsm], ignore_index=True)
+test acc on clean examples (%): 84.444
+test acc on FGSM adversarial examples (%): 19.259 (44.44)
+test acc on PGD adversarial examples (%): 35.556 (50.37)
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:76: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_pgd = pd.concat([pd.DataFrame([data], columns=cols), df_pgd], ignore_index=True)
+/mnt/c/Users/erick/Dropbox/5.Semester/Thesis/thesis-code/pipeline/aml/attacks.py:80: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df_fgsm = pd.concat([pd.DataFrame([data], columns=cols), df_fgsm], ignore_index=True)
+test acc on clean examples (%): 84.444
+test acc on FGSM adversarial examples (%): 18.519 (45.18)
+test acc on PGD adversarial examples (%): 31.852 (49.62)

@@ -179,6 +179,14 @@ def create_figures(df):
                 plt.savefig("analysis_results/"+dataset+"/"+qml_model+"/figures/"+noise_model+"-"+aml_attack+".png")
                 plt.clf()
             elif noise_model == "coherent":
+                # Add noise_model, miscalibration and aml_attack==none data as well to the dataframe to be plotted
+                baseline = df.loc[(df['noise_model'] == 'none') & (df['aml_attack'] == 'none')]
+                data = df.loc[(df['noise_model'] == 'none') & (df['aml_attack'] == aml_attack)]    
+                data = pd.concat([baseline, data])
+                data.sort_values("epsilon", inplace=True)
+                print(data)
+                plt.plot(data['epsilon'], data['accuracy'], color='grey', label=0, alpha=0.7)
+
                 for miscalibration, color in zip(miscalibrations, colors):
                     baseline = df.loc[(df['noise_model'] == noise_model) & (df['aml_attack'] == 'none') & (df['probability|miscalibration'] == miscalibration)]
                     data = df.loc[(df['noise_model'] == noise_model) & (df['aml_attack'] == aml_attack) & (df['probability|miscalibration'] == miscalibration)]
@@ -188,14 +196,6 @@ def create_figures(df):
                     print(data)
                     
                     plt.plot(data['epsilon'], data['accuracy'], color=color, label=miscalibration, alpha=0.7)
-                
-                # TODO: Add noise_model, miscalibration and aml_attack==none data as well to the dataframe to be plotted
-                baseline = df.loc[(df['noise_model'] == 'none') & (df['aml_attack'] == 'none')]
-                data = df.loc[(df['noise_model'] == 'none') & (df['aml_attack'] == aml_attack)]    
-                data = pd.concat([baseline, data])
-                data.sort_values("epsilon", inplace=True)
-                print(data)
-                plt.plot(data['epsilon'], data['accuracy'], color='grey', label=0, alpha=0.7)
 
                 title = "Adversarial accuracy for "+noise_model+" noise with "+(aml_attack.upper())
                 plt.title('\n'.join(wrap(title, 37)), fontdict=font)
@@ -203,6 +203,13 @@ def create_figures(df):
                 plt.savefig("analysis_results/"+dataset+"/"+qml_model+"/figures/"+noise_model+"-"+aml_attack+".png")
                 plt.clf()
             else:
+                # Add noise_model, probability and aml_attack==none data as well to the dataframe to be plotted
+                baseline = df.loc[(df['noise_model'] == 'none') & (df['aml_attack'] == 'none')]
+                data = df.loc[(df['noise_model'] == 'none') & (df['aml_attack'] == aml_attack)]
+                data = pd.concat([baseline, data])
+                data.sort_values("epsilon", inplace=True)
+                print(data)
+                plt.plot(data['epsilon'], data['accuracy'], color='grey', label=0, alpha=0.7)
                 for probability, color in zip(probabilities, colors):
                     baseline = df.loc[(df['noise_model'] == noise_model) & (df['aml_attack'] == 'none') & (df['probability|miscalibration'] == probability)]
                     data = df.loc[(df['noise_model'] == noise_model) & (df['aml_attack'] == aml_attack) & (df['probability|miscalibration'] == probability)]
@@ -212,14 +219,6 @@ def create_figures(df):
                     print(data)
                     
                     plt.plot(data['epsilon'], data['accuracy'], color=color, label=probability, alpha=0.7)
-
-                # Add noise_model, probability and aml_attack==none data as well to the dataframe to be plotted
-                baseline = df.loc[(df['noise_model'] == 'none') & (df['aml_attack'] == 'none')]
-                data = df.loc[(df['noise_model'] == 'none') & (df['aml_attack'] == aml_attack)]
-                data = pd.concat([baseline, data])
-                data.sort_values("epsilon", inplace=True)
-                print(data)
-                plt.plot(data['epsilon'], data['accuracy'], color='grey', label=0, alpha=0.7)
 
                 title = "Adversarial accuracy for "+noise_model+" noise with "+(aml_attack.upper())
                 plt.title('\n'.join(wrap(title, 37)), fontdict=font)
@@ -281,4 +280,6 @@ df.to_csv(results_path+"/"+dataset+".csv", sep='\t')
 print(df.head())
 
 os.makedirs(results_path+"/figures", exist_ok=True)
+# TODO: Retrieve DF from file
+df = pd.read_csv(results_path+"/"+dataset+".csv", sep='\t')
 create_figures(df)
