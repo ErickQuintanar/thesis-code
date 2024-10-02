@@ -8,17 +8,16 @@ import json
 import pandas as pd
 import torch
 
+import matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 from models.qml_models import define_model
-from datasets.fetch_data import fetch_dataset, Dataset
+from datasets.fetch_data import fetch_dataset
 from training.lightning_utils import QMLModel, threshold
 
 from cleverhans.torch.attacks.fast_gradient_method import fast_gradient_method
-from cleverhans.torch.attacks.projected_gradient_descent import projected_gradient_descent
 
-# TODO: Check if ranges are really correct
 epsilons = [0.1, 0.3, 0.5, 0.7, 0.9]
 dataset = "iris"
 qml_model = "pqc"
@@ -35,8 +34,6 @@ for filename in os.listdir(directory):
 
 # Retrieve preprocessed test dataset according to the config
 _, X_test, _, Y_test = fetch_dataset(config["dataset"], path="../datasets")
-test_set = Dataset(X_test, Y_test)
-print(test_set)
 
 qnode, _ = define_model(config)
 model = QMLModel(qnode, weights, config)
@@ -73,13 +70,15 @@ for epsilon in epsilons:
 
 plot = sns.relplot(data=df, x='Sepal Length (cm)', y='Petal Length (cm)', hue='Label')
 plot.figure.suptitle('Petal Length vs. Sepal Length (FGSM)')
-plt.plot([3.6, 4.6], [1.4, 2.1], linewidth=2, color='r')
+plt.plot([3.6, 4.6], [1.2, 2.1], linewidth=2, color='r')
+colors=["blue", "orange"]
+plt.scatter(x=X_test[:,0], y=X_test[:,2], alpha=0.3, c=Y_test, cmap=matplotlib.colors.ListedColormap(colors))
 labels = [0] + epsilons 
 labels.reverse()
 for i, eps in enumerate(labels):
     plt.annotate(eps, (df.iloc[i,0], df.iloc[i,2]))
 ax = plt.gca()
-ax.set_ylim([None, 2.6])
+#ax.set_ylim([None, 2.6])
 plt.savefig(samples_path+'/tabular-adversarial.png')
 datafile = dataset+'-'+qml_model
 df.to_csv(samples_path+'/'+datafile+'.csv', sep='\t', index=False)
