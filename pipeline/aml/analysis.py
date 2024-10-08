@@ -25,7 +25,8 @@ probabilities = [0.02, 0.04, 0.06, 0.08, 0.1]
 
 miscalibrations = [2, 4, 6, 8, 10]
 
-epsilons = [0.1, 0.3, 0.5, 0.7, 0.9]
+#epsilons = [0.1, 0.3, 0.5, 0.7, 0.9]
+epsilons = [0.04, 0.08, 0.12, 0.16, 0.20]
 
 results = []
 
@@ -61,13 +62,11 @@ def model_accuracy(model, test_set):
     acc = correct /  test_set.__len__() * 100.0
     return acc
 
-def adversarial_model_accuracy(labels, adversarial_predictions):
-    correct = 0
-    for y, y_pred in zip(labels, adversarial_predictions):
-        if y_pred == y:
-            correct += 1
-    acc = correct /  labels.shape[0] * 100.0
-    return acc
+def adversarial_model_accuracy(model, Y_test, adversarial_samples):
+    y_pred = threshold(model(adversarial_samples))
+    res = torch.logical_not(torch.logical_xor(y_pred, Y_test))
+    acc = res.float().mean().item()
+    return acc * 100
                 
 def adversarial_analysis(noise_model, probability):
     # Retrieve weights and model
@@ -86,6 +85,8 @@ def adversarial_analysis(noise_model, probability):
     epsilon = "0"
     results.append([qml_model, noise_model, probability, aml_attack, epsilon, acc])
 
+    # Reverse test_set because adversarial samples have been concatenated by being inserted before
+    Y_test = torch.flip(Y_test, dims=(0,))
     for aml_attack in aml_attacks:
         for epsilon in epsilons:
             # Retrieve modified test set from samples_path
@@ -95,8 +96,8 @@ def adversarial_analysis(noise_model, probability):
                     df = pd.read_csv(samples_path+'/'+attack, sep='\t')
                     break
             # Calculate adversarial accuracy from model on modified test set
-            Y = torch.tensor(df.iloc[:, -1].values, requires_grad=False)
-            acc = adversarial_model_accuracy(Y_test, Y)
+            df = df.drop('pred', axis=1)
+            acc = adversarial_model_accuracy(model, Y_test, df.to_numpy())
             results.append([qml_model, noise_model, probability, aml_attack, epsilon, acc])
 
 def prepare_figure(legend):
@@ -255,6 +256,10 @@ if os.path.isdir(samples_path):
     if not (len(items) == 10):
         print("AML attacks haven't been performed.")
         exit()
+
+# TODO: Check evaluation on noiseless model
+#adversarial_analysis('none', 0)
+#exit()
 
 # For all noise models, load pre-trained weights and measure accuracy for PGD and FGSM attacks for all epsilons
 for noise_model in noise_models:
