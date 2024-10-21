@@ -25,8 +25,10 @@ probabilities = [0.02, 0.04, 0.06, 0.08, 0.1]
 
 miscalibrations = [2, 4, 6, 8, 10]
 
-#epsilons = [0.1, 0.3, 0.5, 0.7, 0.9]
-epsilons = [0.04, 0.08, 0.12, 0.16, 0.20]
+if dataset == "plus-minus":
+    epsilons = [0.04, 0.08, 0.12, 0.16, 0.20]
+else:
+    epsilons = [0.1, 0.3, 0.5, 0.7, 0.9]
 
 results = []
 
@@ -235,7 +237,7 @@ if os.path.isdir(results_path):
     items = os.listdir(results_path)
     if len(items) == 1 or len(items) == 2:
         print("Analysis has been performed.")
-        # TODO: Check if figures have been created and exit, else create them with create_graphs() function
+        # Check if figures have been created and exit, else create them with create_graphs() function
         os.makedirs(results_path+"/figures", exist_ok=True)
         if os.path.isdir(results_path+"/figures"):
             items = os.listdir(results_path+"/figures")
@@ -256,10 +258,6 @@ if os.path.isdir(samples_path):
     if not (len(items) == 10):
         print("AML attacks haven't been performed.")
         exit()
-
-# TODO: Check evaluation on noiseless model
-#adversarial_analysis('none', 0)
-#exit()
 
 # For all noise models, load pre-trained weights and measure accuracy for PGD and FGSM attacks for all epsilons
 for noise_model in noise_models:
@@ -285,6 +283,6 @@ df.to_csv(results_path+"/"+dataset+".csv", sep='\t')
 print(df.head())
 
 os.makedirs(results_path+"/figures", exist_ok=True)
-# TODO: Retrieve DF from file
+# Retrieve DF from file
 df = pd.read_csv(results_path+"/"+dataset+".csv", sep='\t')
 create_figures(df)

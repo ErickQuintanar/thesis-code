@@ -15,10 +15,13 @@ from training.lightning_utils import QMLModel, threshold
 from cleverhans.torch.attacks.fast_gradient_method import fast_gradient_method
 from cleverhans.torch.attacks.projected_gradient_descent import projected_gradient_descent
 
-epsilons = [0.1, 0.3, 0.5, 0.7, 0.9]
-
 dataset = sys.argv[1]
 qml_model = sys.argv[2]
+
+if dataset == "plus-minus":
+    epsilons = [0.04, 0.08, 0.12, 0.16, 0.20]
+else:
+    epsilons = [0.1, 0.3, 0.5, 0.7, 0.9]
 
 # Check if attacks have already been performed for dataset and qml_model combo
 samples_path = "modified_samples/"+dataset+"/"+qml_model
@@ -43,7 +46,6 @@ for filename in os.listdir(directory):
 os.makedirs(samples_path, exist_ok=True)
 
 # Retrieve preprocessed test dataset according to the config
-# TODO: If dataset is mnist, further reduce the test dataset to half bc of validation and test
 _, X_test, _, Y_test = fetch_dataset(config["dataset"], path="../datasets")
 test_set = Dataset(X_test, Y_test)
 
