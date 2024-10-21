@@ -1,0 +1,14 @@
+{
+      "dataset": "breast-cancer",
+      "qml_model": "pqc",
+      "noise_model": "amplitude-damping",
+      "num_qubits": 4,
+      "num_layers": 40,
+      "num_classes": 2,
+      "learning_rate": 0.0005,
+      "batch_size": 16,
+      "epochs": 10,
+      "probability": 0.02,
+      "accuracy": 0.5714285969734192,
+      "id": "15d4860f-3e21-4b69-9b18-17027ce29b15"
+}

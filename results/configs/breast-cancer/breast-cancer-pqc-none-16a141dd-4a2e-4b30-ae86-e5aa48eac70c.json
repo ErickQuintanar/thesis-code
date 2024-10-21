@@ -1,0 +1,13 @@
+{
+      "dataset": "breast-cancer",
+      "qml_model": "pqc",
+      "noise_model": "none",
+      "num_qubits": 4,
+      "num_layers": 40,
+      "num_classes": 2,
+      "learning_rate": 0.0005,
+      "batch_size": 16,
+      "epochs": 10,
+      "accuracy": 0.4285714328289032,
+      "id": "16a141dd-4a2e-4b30-ae86-e5aa48eac70c"
+}

@@ -1,0 +1,14 @@
+{
+      "dataset": "diabetes",
+      "qml_model": "pqc",
+      "noise_model": "coherent",
+      "num_qubits": 3,
+      "num_layers": 40,
+      "num_classes": 2,
+      "learning_rate": 0.005,
+      "batch_size": 30,
+      "epochs": 10,
+      "miscalibration": 8,
+      "accuracy": 0.8181818127632141,
+      "id": "07f7be09-2a3f-479c-b6ad-6700fbed5e74"
+}

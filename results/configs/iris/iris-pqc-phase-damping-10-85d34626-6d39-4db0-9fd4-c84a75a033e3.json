@@ -1,0 +1,14 @@
+{
+      "dataset": "iris",
+      "qml_model": "pqc",
+      "noise_model": "phase-damping",
+      "num_qubits": 2,
+      "num_layers": 2,
+      "num_classes": 2,
+      "learning_rate": 0.05,
+      "batch_size": 30,
+      "epochs": 10,
+      "probability": 0.1,
+      "accuracy": 1.0,
+      "id": "85d34626-6d39-4db0-9fd4-c84a75a033e3"
+}

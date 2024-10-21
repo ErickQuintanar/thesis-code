@@ -1,0 +1,14 @@
+{
+      "dataset": "diabetes",
+      "qml_model": "pqc",
+      "noise_model": "phase-flip",
+      "num_qubits": 3,
+      "num_layers": 40,
+      "num_classes": 2,
+      "learning_rate": 0.005,
+      "batch_size": 30,
+      "epochs": 10,
+      "probability": 0.06,
+      "accuracy": 0.4545454680919647,
+      "id": "1122dc70-1199-4377-b1a4-b1d62de5306f"
+}

@@ -1,0 +1,14 @@
+{
+      "dataset": "plus-minus",
+      "qml_model": "pqc",
+      "noise_model": "depolarizing",
+      "num_qubits": 8,
+      "num_layers": 32,
+      "num_classes": 4,
+      "learning_rate": 0.001,
+      "batch_size": 50,
+      "epochs": 10,
+      "probability": 0.02,
+      "accuracy": 0.30000001192092896,
+      "id": "18208890-61d5-4492-91ec-a51608c7c784"
+}

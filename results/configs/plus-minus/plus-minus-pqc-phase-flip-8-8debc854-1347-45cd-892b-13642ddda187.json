@@ -1,0 +1,14 @@
+{
+      "dataset": "plus-minus",
+      "qml_model": "pqc",
+      "noise_model": "phase-flip",
+      "num_qubits": 8,
+      "num_layers": 32,
+      "num_classes": 4,
+      "learning_rate": 0.001,
+      "batch_size": 50,
+      "epochs": 10,
+      "probability": 0.08,
+      "accuracy": 0.10000000149011612,
+      "id": "8debc854-1347-45cd-892b-13642ddda187"
+}

@@ -1,0 +1,14 @@
+{
+      "dataset": "plus-minus",
+      "qml_model": "pqc",
+      "noise_model": "phase-damping",
+      "num_qubits": 8,
+      "num_layers": 32,
+      "num_classes": 4,
+      "learning_rate": 0.001,
+      "batch_size": 50,
+      "epochs": 10,
+      "probability": 0.08,
+      "accuracy": 0.4000000059604645,
+      "id": "c192ed8d-39b2-4d4c-b93c-a6e93c4d010b"
+}

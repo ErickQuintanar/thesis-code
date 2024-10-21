@@ -1,0 +1,14 @@
+{
+      "dataset": "iris",
+      "qml_model": "pqc",
+      "noise_model": "phase-flip",
+      "num_qubits": 2,
+      "num_layers": 2,
+      "num_classes": 2,
+      "learning_rate": 0.05,
+      "batch_size": 30,
+      "epochs": 10,
+      "probability": 0.08,
+      "accuracy": 1.0,
+      "id": "a67a617f-ba6d-4eb3-8ad5-8674df628bb1"
+}

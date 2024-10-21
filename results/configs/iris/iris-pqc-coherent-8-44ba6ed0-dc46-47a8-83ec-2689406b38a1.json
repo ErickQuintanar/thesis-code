@@ -1,0 +1,14 @@
+{
+      "dataset": "iris",
+      "qml_model": "pqc",
+      "noise_model": "coherent",
+      "num_qubits": 2,
+      "num_layers": 2,
+      "num_classes": 2,
+      "learning_rate": 0.05,
+      "batch_size": 30,
+      "epochs": 10,
+      "miscalibration": 8,
+      "accuracy": 1.0,
+      "id": "44ba6ed0-dc46-47a8-83ec-2689406b38a1"
+}
